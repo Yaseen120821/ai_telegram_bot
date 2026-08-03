@@ -104,6 +104,12 @@ class Florence2Model:
                                 "(past_key_values[idx] if isinstance(past_key_values, (list, tuple)) else None)"
                             )
                             modified = True
+                        if "[x.item() for x in torch.linspace(" in content:
+                            content = content.replace(
+                                "[x.item() for x in torch.linspace(0, drop_path_rate, sum(depths)*2)]",
+                                "torch.linspace(0, drop_path_rate, sum(depths)*2, device='cpu').tolist()"
+                            )
+                            modified = True
                         if modified:
                             with open(fpath, "w", encoding="utf-8") as f:
                                 f.write(content)

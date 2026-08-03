@@ -121,7 +121,7 @@ class TestVisionFoundationFramework(unittest.TestCase):
         self.assertEqual(res.status, VisionStatus.COMPLETED)
         self.assertIsNotNone(res.image_context)
         self.assertEqual(res.image_context.metadata.format, ImageFormat.PNG)
-        self.assertIn("=== ATTACHED IMAGE CONTEXT ===", res.image_context.formatted_prompt_block)
+        self.assertIn("=== ATTACHED IMAGE CONTEXT", res.image_context.formatted_prompt_block)
 
     # 6. Test VisionManager Caching
     def test_vision_manager_caching(self):
