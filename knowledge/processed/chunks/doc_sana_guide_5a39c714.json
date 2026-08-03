@@ -1,0 +1,24 @@
+[
+  {
+    "chunk_id": "chunk_doc_sana_guide_5a39c714_0000",
+    "doc_id": "doc_sana_guide_5a39c714",
+    "content": "Chapter 8: Retrieval-Augmented Generation (RAG)\n\nPart 1: RAG Architecture & System Design.\nPart 2: Document Processing & Ingestion Pipeline.\nPart 3: Sentence Transformers & Vector Embeddings.\nPart 4: FAISS Vector Index Storage & Similarity Search.",
+    "chunk_index": 0,
+    "start_char": 0,
+    "end_char": 247,
+    "estimated_tokens": 61,
+    "hash_digest": "8ed49a8fa22e0670821e79881d68f9f0",
+    "metadata": {
+      "file_id": "doc_sana_guide_5a39c714",
+      "filename": "sana_guide.txt",
+      "file_type": "txt",
+      "file_path": "C:\\Users\\DELL\\AppData\\Local\\Temp\\tmp1_ieblop\\sana_guide.txt",
+      "file_size_bytes": 254,
+      "word_count": 32,
+      "char_count": 247,
+      "estimated_tokens": 61,
+      "hash_digest": "5a39c714472028e488f14f7c15c29b4ead3b009fb14e84945389a21d84fc741a",
+      "created_at": 1785499088.3176403
+    }
+  }
+]

@@ -1,0 +1,3 @@
+# Knowledge Directory Structure
+Raw un-processed documents are stored in subdirectories under `knowledge/documents/`.
+Processed chunk JSON artifacts are stored in `knowledge/processed/chunks/`.

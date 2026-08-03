@@ -1,0 +1,24 @@
+[
+  {
+    "chunk_id": "chunk_doc_sana_spec_7652d42b_0000",
+    "doc_id": "doc_sana_spec_7652d42b",
+    "content": "SANA AI is an empathetic, intelligent local AI assistant engineered by Yaseen. It features a local Qwen LLM, persistent SQLite long-term memory, PyTorch affective emotional computing, and a high-performance Retrieval-Augmented Generation (RAG) subsystem. The RAG subsystem processes PDF, DOCX, TXT, Markdown, JSON, CSV, and source code files, converting them into dense 384-dimensional vector embeddings via Sentence Transformers.",
+    "chunk_index": 0,
+    "start_char": 0,
+    "end_char": 430,
+    "estimated_tokens": 107,
+    "hash_digest": "e0e5bfe9c9cdeea7af2371c8e885b1c4",
+    "metadata": {
+      "file_id": "doc_sana_spec_7652d42b",
+      "filename": "sana_spec.txt",
+      "file_type": "txt",
+      "file_path": "C:\\Users\\DELL\\AppData\\Local\\Temp\\tmpup1jeo1a\\sana_spec.txt",
+      "file_size_bytes": 430,
+      "word_count": 61,
+      "char_count": 430,
+      "estimated_tokens": 107,
+      "hash_digest": "7652d42bf84d79d27f8d354a9f3b25e3572543b3f8173e7e33ce6c9a50bbc601",
+      "created_at": 1785499798.0777438
+    }
+  }
+]

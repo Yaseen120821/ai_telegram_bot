@@ -1,0 +1,24 @@
+[
+  {
+    "chunk_id": "chunk_doc_prod_spec_8bf64ec5_0000",
+    "doc_id": "doc_prod_spec_8bf64ec5",
+    "content": "SANA AI Production RAG Subsystem Specification Version 2.0 - MODIFIED",
+    "chunk_index": 0,
+    "start_char": 0,
+    "end_char": 69,
+    "estimated_tokens": 17,
+    "hash_digest": "965197713f2224ec3fb8dacd9cf7d847",
+    "metadata": {
+      "file_id": "doc_prod_spec_8bf64ec5",
+      "filename": "prod_spec.txt",
+      "file_type": "txt",
+      "file_path": "C:\\Users\\DELL\\AppData\\Local\\Temp\\tmpgu8hc7rx\\prod_spec.txt",
+      "file_size_bytes": 69,
+      "word_count": 10,
+      "char_count": 69,
+      "estimated_tokens": 17,
+      "hash_digest": "8bf64ec578f60cc6e631d91809679577f0e87a335059d3ebd9938d4eca3f0e4f",
+      "created_at": 1785500584.1552384
+    }
+  }
+]
