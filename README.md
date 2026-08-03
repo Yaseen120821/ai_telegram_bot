@@ -73,7 +73,7 @@ Run the following command in your terminal:
 
 | Command / Feature | Description |
 | :--- | :--- |
-| `/start` | Welcomes user, introduces SANA AI, renders interactive menu keyboard |
+| `/start` | Welcomes user, introduces AI, renders interactive menu keyboard |
 | `/help` | Displays command guide & architecture status |
 | `❓ Help` | Reply Keyboard button to trigger help menu |
 | `🤖 About SANA` | Reply Keyboard button to show bot bio |
