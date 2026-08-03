@@ -29,6 +29,7 @@ class RoutingMode(str, Enum):
     TOOL_AND_RAG = "tool_and_rag"             # Execute tool and retrieve RAG document context
     MULTIPLE_TOOLS = "multiple_tools"         # Execute a sequence/chain of tools
     CLARIFICATION_REQUIRED = "clarification"  # Query user for ambiguous missing arguments
+    MULTIMODAL = "multimodal"                 # Multimodal image, PDF, document & visual context processing
 
 
 class DecisionType(str, Enum):
@@ -37,6 +38,7 @@ class DecisionType(str, Enum):
     EXECUTE_RAG = "execute_rag"
     DIRECT_LLM = "direct_llm"
     ASK_CLARIFICATION = "ask_clarification"
+    MULTIMODAL_RESPONSE = "multimodal_response"
     FALLBACK = "fallback"
 
 

@@ -67,6 +67,7 @@ class IntelligentPipeline:
         self,
         query: str,
         image_paths: Optional[List[str]] = None,
+        document_context: Optional[str] = None,
         user_id: str = "default_user",
         conversation_id: str = "default_session",
         history: Optional[List[Dict[str, str]]] = None,
@@ -77,35 +78,55 @@ class IntelligentPipeline:
     ) -> CombinedResponse:
         """
         Processes an incoming query through the complete intelligent decision pipeline.
-        Supports multimodal image inputs, memory retrieval, emotion guidance, RAG, and tools.
+        Supports multimodal image inputs, PDF/document contexts, memory retrieval, emotion guidance, RAG, and tools.
         """
         start_time = time.perf_counter()
         query_text = query.strip() if query and query.strip() else "Analyze attached media context."
-        logger.info(f"⚡ IntelligentPipeline processing query: '{query_text}' [User: {user_id}] [Images: {len(image_paths) if image_paths else 0}]")
+        img_count = len(image_paths) if image_paths else 0
+        pdf_count = 1 if (document_context and "PDF" in document_context) else 0
+        logger.info(f"⚡ IntelligentPipeline processing query: '{query_text}' [User: {user_id}] [Images: {img_count}] [PDF/Doc: {bool(document_context)}]")
 
         # 0. Process Multimodal Vision & Domain Analysis if image attachments exist
         vision_context_str: Optional[str] = None
         if image_paths:
-            logger.info(f"👁️ Pipeline processing {len(image_paths)} attached image(s) via Vision AI...")
+            logger.info(f"📸 Attachment detected | Image count: {img_count} | PDF count: {pdf_count}")
+            logger.info(f"👁️ Pipeline processing {img_count} attached image(s) via Vision AI...")
             try:
                 from app.vision.vision_manager import VisionManager
                 vision_context_str = VisionManager.get_instance().process_multimodal_images(image_paths)
+                logger.info(f"✅ VisionResult generated ({len(vision_context_str)} chars).")
             except Exception as v_err:
                 logger.error(f"Vision AI processing error: {v_err}")
-                vision_context_str = f"=== ATTACHED IMAGE CONTEXT ===\nImages attached ({len(image_paths)} files), but vision processing encountered an error.\n=== END IMAGE CONTEXT ==="
+                vision_context_str = f"=== ATTACHED IMAGE CONTEXT ===\nImages attached ({img_count} files), but vision processing encountered an error.\n=== END IMAGE CONTEXT ==="
+
+        # If document_context is provided (PDF/scanned PDF/text document), merge into vision_context_str
+        if document_context and document_context.strip():
+            logger.info(f"📸 Attachment detected | Document context present ({len(document_context)} chars).")
+            if vision_context_str and vision_context_str.strip():
+                vision_context_str = f"{vision_context_str}\n\n{document_context.strip()}"
+            else:
+                vision_context_str = document_context.strip()
 
         debug_multimodal = os.getenv("DEBUG_MULTIMODAL", "False").lower() in ("true", "1", "yes")
         if debug_multimodal and vision_context_str:
             logger.info(f"\n==================== [DEBUG MULTIMODAL: VISION CONTEXT] ====================\n{vision_context_str}\n==========================================================================")
 
-        # 1. Routing Decision
+        # 1. Routing Decision - Forward routing context with image_paths and vision_context to DecisionEngine
+        routing_context = {
+            "image_paths": image_paths or [],
+            "vision_context": vision_context_str,
+            "document_context": document_context,
+            "has_vision": bool(vision_context_str)
+        }
         decision, tool_request = self.router.route_query(
             query=query_text,
             user_id=user_id,
-            user_confirmed=user_confirmed
+            user_confirmed=user_confirmed,
+            context=routing_context
         )
+        logger.info(f"Routing mode selected: {decision.routing_mode.value} | Final routing mode: {decision.routing_mode.value}")
 
-        # 2. Tool Execution (if required)
+        # 2. Tool Execution (if required) - Bypassed for MULTIMODAL mode
         tool_context_obj: Optional[ToolContext] = None
         executed_tools: List[str] = []
         if decision.should_call_tool and decision.selected_tool:
@@ -134,6 +155,8 @@ class IntelligentPipeline:
             if rag_res and rag_res.chunks:
                 rag_ctx_obj = RAGManager.get_instance().build_context(query_text, rag_res.chunks)
                 rag_context_str = rag_ctx_obj.formatted_text
+            elif decision.routing_mode == RoutingMode.RAG:
+                rag_context_str = f"=== RAG KNOWLEDGE CONTEXT ===\nSearch Query: {query_text}\nNotice: Knowledge base queried, but no matching document chunks were retrieved.\n=== END RAG KNOWLEDGE CONTEXT ==="
         except Exception as rag_err:
             logger.warning(f"Could not retrieve RAG knowledge context: {rag_err}")
 
@@ -170,17 +193,22 @@ class IntelligentPipeline:
             image_paths=image_paths or [],
             decision=decision
         )
+        if vision_context_str:
+            logger.info("Vision context injected into IntegratedContext.")
 
         # 6. Build Token-Budgeted Prompt Context
         p_ctx = self.context_builder.assemble_prompt_context(
             integrated_context=int_ctx,
             history=history
         )
+        if p_ctx.vision_context:
+            logger.info("Prompt contains image context.")
 
         if debug_multimodal:
             logger.info(f"\n==================== [DEBUG MULTIMODAL: GENERATOR INPUT] ====================\nUser Input: {query_text}\nVision Context Present: {bool(p_ctx.vision_context)}\nTool Context Present: {bool(p_ctx.tool_context)}\nToken Estimate: {p_ctx.token_estimate}\n==========================================================================")
 
         # 7. Generate Response via TextGenerator
+        logger.info(f"Generator received image context (Present: {bool(p_ctx.vision_context)})")
         if generator_callback:
             formatted_prompt = self.prompt_builder.build_prompt(
                 user_input=query_text,
@@ -221,7 +249,7 @@ class IntelligentPipeline:
             query=query_text,
             answered_directly=not bool(executed_tools or rag_context_str),
             used_memory=bool(memory_context),
-            used_rag=bool(rag_context_str),
+            used_rag=bool(rag_context_str or decision.routing_mode == RoutingMode.RAG),
             used_tool=bool(executed_tools),
             tools_used=executed_tools,
             total_latency_ms=elapsed_ms

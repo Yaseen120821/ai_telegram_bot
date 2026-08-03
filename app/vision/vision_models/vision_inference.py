@@ -85,40 +85,16 @@ class VisionInferenceEngine:
         return parse_bounding_boxes(od_res)
 
     def execute_ocr(self, pil_img: PILImage.Image) -> OCRTextResult:
-        """Executes EasyOCR text extraction on PIL Image."""
+        """Executes EasyOCR text extraction on PIL Image via OCREngine singleton."""
         try:
-            reader = self._get_ocr_reader()
-            if reader is None:
-                return OCRTextResult(raw_text="", line_count=0, word_count=0, confidence=0.0)
-
-            img_arr = np.array(pil_img.convert("RGB"))
-            
-            # EasyOCR detail=1 returns list of [bbox, text, prob]
-            results = reader.readtext(img_arr, detail=1)
-
-            extracted_lines: List[str] = []
-            regions: List[Dict[str, Any]] = []
-
-            for bbox, text, prob in results:
-                if prob >= 0.2:  # Confidence threshold
-                    extracted_lines.append(text)
-                    regions.append({
-                        "text": text,
-                        "confidence": round(float(prob), 2),
-                        "bbox": [[int(pt[0]), int(pt[1])] for pt in bbox]
-                    })
-
-            raw_text = clean_ocr_text("\n".join(extracted_lines))
-            word_count = len(raw_text.split())
-
+            from app.vision.ocr.ocr_engine import OCREngine
+            ocr_res = OCREngine.get_instance().extract_text(pil_img)
             return OCRTextResult(
-                raw_text=raw_text,
-                line_count=len(extracted_lines),
-                word_count=word_count,
-                confidence=0.88 if extracted_lines else 0.0,
-                regions=regions
+                raw_text=ocr_res.raw_text,
+                line_count=ocr_res.line_count,
+                word_count=ocr_res.word_count,
+                confidence=ocr_res.confidence
             )
-
         except Exception as e:
             logger.error(f"EasyOCR text extraction failed: {e}")
             return OCRTextResult(

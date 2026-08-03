@@ -63,6 +63,27 @@ class DecisionEngine:
                 fallback_reason="Empty user query text."
             )
 
+        # 0. Multimodal Attachment & Context Detection
+        if context and isinstance(context, dict):
+            has_images = bool(context.get("images") or context.get("image_paths"))
+            has_pdfs = bool(context.get("pdfs") or context.get("pdf_path") or context.get("pdf_paths"))
+            has_documents = bool(context.get("documents") or context.get("doc_path") or context.get("document_paths") or context.get("document_context"))
+            has_ocr = bool(context.get("ocr") or context.get("ocr_text") or context.get("ocr_context"))
+            has_vision = bool(context.get("vision_context") or context.get("has_vision"))
+
+            if has_images or has_pdfs or has_documents or has_ocr or has_vision:
+                img_cnt = len(context.get("image_paths") or context.get("images") or [])
+                pdf_cnt = 1 if has_pdfs else 0
+                logger.info(
+                    f"📸 Attachment detected | Image count: {img_cnt} | PDF count: {pdf_cnt} | "
+                    f"Routing mode selected: MULTIMODAL"
+                )
+                return RoutingDecision(
+                    routing_mode=RoutingMode.MULTIMODAL,
+                    decision_type=DecisionType.MULTIMODAL_RESPONSE,
+                    confidence=ConfidenceScore(1.0, ConfidenceLevel.HIGH, "Visual/multimodal context or attachment detected.")
+                )
+
         # 1. Manual Override Handling
         if manual_override_tool:
             if self.registry.has_tool(manual_override_tool):

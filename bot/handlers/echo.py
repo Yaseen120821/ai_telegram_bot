@@ -182,8 +182,9 @@ async def handle_document_message(message: Message, bot: Bot) -> None:
         bot=bot,
         user_id=user_id,
         user_name=user_name,
-        prompt_text=f"{caption_text}\n\n{pdf_context_block}",
-        image_paths=None
+        prompt_text=caption_text,
+        image_paths=None,
+        document_context=pdf_context_block
     )
 
 
@@ -208,7 +209,8 @@ async def handle_ai_chat_message(message: Message, bot: Bot) -> None:
         user_id=user_id,
         user_name=user_name,
         prompt_text=user_text,
-        image_paths=None
+        image_paths=None,
+        document_context=None
     )
 
 
@@ -218,7 +220,8 @@ async def _process_and_reply(
     user_id: str,
     user_name: str,
     prompt_text: str,
-    image_paths: Optional[List[str]] = None
+    image_paths: Optional[List[str]] = None,
+    document_context: Optional[str] = None
 ) -> None:
     """Helper method executing full pipeline, history tracking, offloading, and reply delivery."""
     # 1. Analyze Emotion & retrieve EmotionContext
@@ -243,6 +246,7 @@ async def _process_and_reply(
             _pipeline.process_query,
             query=prompt_text,
             image_paths=image_paths,
+            document_context=document_context,
             user_id=user_id,
             conversation_id=str(message.chat.id),
             history=history,

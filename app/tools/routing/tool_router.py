@@ -53,10 +53,12 @@ class ToolRouter:
         2. If tool decision confirmed, validate tool state & construct ToolRequest.
         3. Return Tuple[RoutingDecision, Optional[ToolRequest]].
         """
+        ctx_dict = context if isinstance(context, dict) else (context.metadata if (context and hasattr(context, "metadata")) else None)
+
         decision: RoutingDecision = self.decision_engine.evaluate_request(
             query=query,
             manual_override_tool=manual_override_tool,
-            context=context.metadata if context else None
+            context=ctx_dict
         )
 
         if not decision.should_call_tool or not decision.selected_tool:
